@@ -11,10 +11,16 @@ st.set_page_config(page_title="Crypto Joe BTC Dashboard", layout="wide")
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # --- CAPTCHA SETUP ---
-st.session_state.setdefault("captcha_passed", False)
+if "captcha_passed" not in st.session_state:
+    st.session_state.captcha_passed = False
+if "captcha_a" not in st.session_state or "captcha_b" not in st.session_state:
+    st.session_state.captcha_a = random.randint(1, 9)
+    st.session_state.captcha_b = random.randint(1, 9)
+
 if not st.session_state.captcha_passed:
     st.header("🔒 Simple Captcha Verification")
-    a, b = random.randint(1, 9), random.randint(1, 9)
+    a = st.session_state.captcha_a
+    b = st.session_state.captcha_b
     captcha_input = st.text_input(f"What is {a} + {b}? (anti-bot)")
     if st.button("Verify"):
         if captcha_input.strip() == str(a + b):
@@ -22,6 +28,9 @@ if not st.session_state.captcha_passed:
             st.success("Captcha passed! Welcome.")
         else:
             st.error("Incorrect. Please try again.")
+            # Genereer nieuwe captcha na een fout antwoord
+            st.session_state.captcha_a = random.randint(1, 9)
+            st.session_state.captcha_b = random.randint(1, 9)
     st.stop()
 
 # --- TITLE ---
