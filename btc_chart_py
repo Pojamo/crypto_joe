@@ -4,11 +4,25 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import datetime
 import openai
-import json
+import random
 
 # --- CONFIG ---
 st.set_page_config(page_title="Crypto Joe BTC Dashboard", layout="wide")
 openai.api_key = st.secrets["OPENAI_API_KEY"]
+
+# --- CAPTCHA SETUP ---
+st.session_state.setdefault("captcha_passed", False)
+if not st.session_state.captcha_passed:
+    st.header("🔒 Simple Captcha Verification")
+    a, b = random.randint(1, 9), random.randint(1, 9)
+    captcha_input = st.text_input(f"What is {a} + {b}? (anti-bot)")
+    if st.button("Verify"):
+        if captcha_input.strip() == str(a + b):
+            st.session_state.captcha_passed = True
+            st.success("Captcha passed! Welcome.")
+        else:
+            st.error("Incorrect. Please try again.")
+    st.stop()
 
 # --- TITLE ---
 st.title("🧠 Crypto Joe – Daily Bitcoin Update")
